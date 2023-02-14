@@ -12,19 +12,6 @@ module.exports = {
         return res.status(400).send({ message: "the body is empty" });
       }
 
-      const usernameAlreadyExists = await user.findOne({
-        logging: (log, queryObject) => {
-          logQuery(log, queryObject);
-        },
-        where: {
-          username: body.username
-        }
-      })
-
-      if(usernameAlreadyExists){
-        return res.status(400).send({ message: "this username already exist"})
-      }
-
       if (!body.name) {
         return res
           .status(400)
@@ -43,6 +30,19 @@ module.exports = {
           .send({ message: "cannot create without a password" });
       }
 
+      const usernameAlreadyExists = await user.findOne({
+        logging: (log, queryObject) => {
+          logQuery(log, queryObject);
+        },
+        where: {
+          username: body.username
+        }
+      })
+
+      if(usernameAlreadyExists){
+        return res.status(400).send({ message: "this username already exist"})
+      }
+
       body.password = await argon2.hash(body.password);
 
       await user.create(body, {
@@ -51,7 +51,7 @@ module.exports = {
         }
       });
 
-      res.status(200).send({ message: "User created with success" });
+      res.status(201).send({ message: "User created with success" });
     } catch (error) {
       Logging.error(error);
       res.status(500).send({ message: "Internal Server Error!" });

@@ -1,10 +1,14 @@
 const express = require("express");
 const routes = express.Router();
 
-const UserRoute = require("./routes/UserRoute")
+const UserRouter = require("./routes/UserRouter")
+const ArticleRouter = require("./routes/ArticleRouter")
+const LoginRouter = require("./routes/LoginRouter")
 
 const routesList = {
-    UserRoute
+    UserRouter,
+    ArticleRouter,
+    LoginRouter
 }
 
 for(const router in routesList){

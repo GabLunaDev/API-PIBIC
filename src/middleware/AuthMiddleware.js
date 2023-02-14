@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const messages = require("../models/responseMessages");
+const dotenv = require("dotenv/config");
 
 const unauthenticatedRoutes = ["/api/login"]
 
@@ -19,9 +19,9 @@ module.exports = async (req, res, next) => {
       return res.status(400).json({ valid: false, error: "Token não identificado." })
 
     } else {
-      jwt.verify(token, process.env.SECRET, (error, decoded) => {
+      jwt.verify(token, process.env.JWT_SECRET, (error, decoded) => {
         if (error) {
-          return res.status(401).json({ valid: false, error: messages._ERROR_UNAUTHENTICATED_TOKEN })
+          return res.status(401).json({ valid: false, error: "Invalid token" })
         } else {
           req.auth = {
             ...decoded

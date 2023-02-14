@@ -1,4 +1,6 @@
 const user = require("../models/user");
+const dotenv = require("dotenv/config");
+
 
 const jwt = require("jsonwebtoken");
 const argon2 = require("argon2");
@@ -25,9 +27,6 @@ module.exports = {
       where: {
         username: body.username,
       },
-      attributes: {
-        exclude: ["id"],
-      },
     });
 
     if (
@@ -42,7 +41,7 @@ module.exports = {
         id: userData.id,
         name: userData.name,
       },
-      process.env.SECRET
+      process.env.JWT_SECRET
     );
 
     return res.send({

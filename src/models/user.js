@@ -36,7 +36,33 @@ const user = (sequelize, DataTypes) => {
     { freezeTableName: true }
   );
 
-  User.associate = function (models) {};
+  User.associate = function (models) {
+    models.user.hasMany('article', {
+      foreignKey: {
+        name: "added_by"
+      }
+    })
+    models.user.hasMany('article', {
+      foreignKey: {
+        name: "validated_by"
+      }
+    })
+    models.user.hasMany(models.review, {
+      foreignKey: {
+          name: "first_reviewer"
+      }
+  })
+  models.user.hasMany(models.review, {
+      foreignKey: {
+          name: "second_reviewer"
+      }
+  })
+  models.user.hasMany(models.review, {
+      foreignKey: {
+          name: "third_reviewer"
+      }
+  })
+  };
   return User;
 };
 module.exports = user(sequelize, DataTypes);

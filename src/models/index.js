@@ -3,11 +3,13 @@ const sequelize = require("../config/sequelize");
 const user = require("./user");
 const article = require("./article");
 const review = require("./review");
+const search_strings = require("./search_strings")
 
 const models = {
   user,
   article,
-  review
+  review,
+  search_strings
 };
 
 for (const key in models) {

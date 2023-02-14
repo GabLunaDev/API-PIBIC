@@ -12,5 +12,8 @@ module.exports = {
     },
     async error(args) {
         console.log(chalk.red(`[${new Date().toLocaleString()}][ERROR]`), typeof args === 'string' ? chalk.redBright(args) : args);
+    },
+    async query(args){
+        console.log(chalk.green(`[${new Date().toLocaleString()}][QUERY]`), typeof args === 'string' ? chalk.greenBright(args) : args);
     }
 }

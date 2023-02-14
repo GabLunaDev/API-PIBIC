@@ -25,6 +25,7 @@ const user = (sequelize, DataTypes) => {
       username: {
         type: DataTypes.STRING,
         allowNull: false,
+        unique: true,
         comment: "user's username"
       },
       password: {

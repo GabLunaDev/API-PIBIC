@@ -7,8 +7,6 @@ const routesList = {
     UserRoute
 }
 
-console.log("teste");
-
 for(const router in routesList){
     routes.use(routesList[router]);
 }

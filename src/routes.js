@@ -1,9 +1,13 @@
 const express = require("express");
 const routes = express.Router();
 
-const routesList = {
+const UserRoute = require("./routes/UserRoute")
 
+const routesList = {
+    UserRoute
 }
+
+console.log("teste");
 
 for(const router in routesList){
     routes.use(routesList[router]);

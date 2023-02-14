@@ -17,6 +17,7 @@ try {
   app.use(express.json);
   app.use("/api", routes);
 
+  app.use(express.urlencoded({ extended: true }))
   app.listen(process.env.PORT || 5000, () => {
     Logging.info(`Server started at port ${process.env.PORT || 5000}`);
   });

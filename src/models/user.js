@@ -37,12 +37,12 @@ const user = (sequelize, DataTypes) => {
   );
 
   User.associate = function (models) {
-    models.user.hasMany('article', {
+    models.user.hasMany(models.article, {
       foreignKey: {
         name: "added_by"
       }
     })
-    models.user.hasMany('article', {
+    models.user.hasMany(models.article, {
       foreignKey: {
         name: "validated_by"
       }

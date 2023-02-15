@@ -61,8 +61,9 @@ const article = (sequelize, DataTypes) => {
 
   Article.associate = function (models) {
     models.article.belongsTo(models.user, {
+      as: "inserted_by",
       foreignKey: {
-        name: "added_by",
+        name: "created_by",
       },
     });
     models.article.belongsTo(models.user, {

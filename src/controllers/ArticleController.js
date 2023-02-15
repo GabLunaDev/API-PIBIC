@@ -8,7 +8,7 @@ module.exports = {
   async create(req, res, next) {
     const { name, year, language, page, search_engine, link } = req.body;
     const userData = req.auth;
-    const added_by = userData.id;
+    const created_by = userData.id;
 
     try {
       if (!name) {
@@ -42,7 +42,7 @@ module.exports = {
           page,
           search_engine,
           link,
-          added_by,
+          created_by,
         },
         {
           logging: (log, queryObject) => {
@@ -64,6 +64,16 @@ module.exports = {
         logging: (log, queryObject) => {
           logQuery(log, queryObject);
         },
+        attributes: {
+          exclude: ["created_by"]
+        },
+        include: [
+          {
+            model: user,
+            as: "inserted_by",
+            attributes: ["id", "name", "username"]
+          }
+        ]
       });
 
       if (!articleData.length > 0) {

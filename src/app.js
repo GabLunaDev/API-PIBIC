@@ -13,7 +13,7 @@ const { logMiddleware } = require("./middleware/LogMiddleware");
 try {
   app.use(logMiddleware);
   app.use(express.json());
-  app.use("/api", routes);
+  app.use("/.netlify/functions/api", routes);
 
   app.use(express.urlencoded({ extended: true }));
   app.listen(process.env.PORT || 5000, () => {

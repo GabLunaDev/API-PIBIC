@@ -22,7 +22,6 @@
   "homepage": "https://github.com/GabLunaDev/API-PIBIC#readme",
   "dependencies": {
     "argon2": "^0.30.3",
-    "aws-sdk": "^2.1315.0",
     "body-parser": "^1.20.1",
     "chalk": "^4.1.2",
     "cookie-parser": "^1.4.6",
@@ -32,11 +31,7 @@
     "http": "^0.0.1-security",
     "jsonwebtoken": "^9.0.0",
     "luxon": "^3.2.1",
-    "mock-aws-s3": "^4.0.2",
-    "netlify-lambda": "^2.0.15",
-    "nock": "^13.3.0",
     "pg": "^8.9.0",
-    "sequelize": "^6.28.0",
-    "serverless-http": "^3.1.1"
+    "sequelize": "^6.28.0"
   }
 }

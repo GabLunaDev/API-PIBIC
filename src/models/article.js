@@ -71,6 +71,11 @@ const article = (sequelize, DataTypes) => {
         name: "validated_by",
       },
     });
+    models.article.hasMany(models.review, {
+      foreignKey: {
+        name: "article_id"
+      }
+    })
   };
   return Article;
 };

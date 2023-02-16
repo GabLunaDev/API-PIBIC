@@ -2,11 +2,14 @@ const article = require("../models/article");
 const user = require("../models/user");
 const { logQuery } = require("../utils/common");
 const { Op } = require("sequelize");
+const dbConnection = require("../config/sequelize")
 const Logging = require("../utils/logging");
+const review = require("../models/review");
 
 module.exports = {
   async create(req, res, next) {
-    const { name, year, language, page, search_engine, link } = req.body;
+    const { name, year, language, page, search_engine, link, reviews, next_reviewer_id } =
+      req.body;
     const userData = req.auth;
     const created_by = userData.id;
 
@@ -17,39 +20,71 @@ module.exports = {
           .send({ message: "You can't create without the name" });
       }
 
-      const articleAlreadyExists = await article.findOne({
-        logging: (log, queryObject) => {
-          logQuery(log, queryObject);
-        },
-        where: {
-          name: {
-            [Op.iLike]: `${name}%`,
+      await dbConnection.transaction(async(t)=> {
+
+        const articleAlreadyExists = await article.findOne({
+          logging: (log, queryObject) => {
+            logQuery(log, queryObject);
           },
-        },
-      });
-
-      if (articleAlreadyExists) {
-        return res
-          .status(400)
-          .send({ message: "An article with this name already exists" });
-      }
-
-      await article.create(
-        {
+          transaction: t,
+          where: {
+            name: {
+              [Op.iLike]: `${name}%`,
+            },
+          },
+        });
+  
+        let body = {
           name,
           year,
           language,
           page,
           search_engine,
           link,
-          created_by,
-        },
-        {
+          created_by
+        };
+  
+        if (reviews) {
+          await reviews.map(async(valueObject) => {
+            return valueObject["reviewer_id"] =  userData.id
+          })
+  
+          body.reviews = reviews
+        }
+  
+        if (articleAlreadyExists) {
+          return res
+            .status(400)
+            .send({ message: "An article with this name already exists" });
+        }
+  
+        const articleData = await article.create(
+          body,
+          {
+            logging: (log, queryObject) => {
+              logQuery(log, queryObject);
+            },
+            transaction: t,
+            include: [
+              {
+                association: article.associations.reviews
+              }
+            ]
+          }
+        );
+
+        await review.create({
+          review_id: articleData.reviews[0].id,
+          article_id: articleData.id,
+          reviewer_id: next_reviewer_id
+        }, {
           logging: (log, queryObject) => {
             logQuery(log, queryObject);
           },
-        }
-      );
+          transaction: t,
+        })
+      })
+
 
       return res.status(201).send({ message: "Article created with success" });
     } catch (error) {
@@ -65,15 +100,15 @@ module.exports = {
           logQuery(log, queryObject);
         },
         attributes: {
-          exclude: ["created_by"]
+          exclude: ["created_by"],
         },
         include: [
           {
             model: user,
             as: "inserted_by",
-            attributes: ["id", "name", "username"]
-          }
-        ]
+            attributes: ["id", "name", "username"],
+          },
+        ],
       });
 
       if (!articleData.length > 0) {
@@ -139,7 +174,7 @@ module.exports = {
         },
       });
 
-      return res.status(200).send({ message: "article updated with success"})
+      return res.status(200).send({ message: "article updated with success" });
     } catch (error) {
       Logging.error(error);
       return res.status(500).send({ message: "Internal Server Error" });

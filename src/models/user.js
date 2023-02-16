@@ -30,8 +30,12 @@ const user = (sequelize, DataTypes) => {
       },
       password: {
         type: DataTypes.STRING,
-        allowNull: true,
+        allowNull: false,
         comment: "user's password"
+      },
+      slack_member_id: {
+        type: DataTypes.STRING,
+        allowNull: false
       }
     },
     { freezeTableName: true }
@@ -49,20 +53,12 @@ const user = (sequelize, DataTypes) => {
       }
     })
     models.user.hasMany(models.review, {
+      as: "reviews",
+      allowNull: false,
       foreignKey: {
-          name: "first_reviewer"
+          name: "reviewer_id"
       }
-  })
-  models.user.hasMany(models.review, {
-      foreignKey: {
-          name: "second_reviewer"
-      }
-  })
-  models.user.hasMany(models.review, {
-      foreignKey: {
-          name: "third_reviewer"
-      }
-  })
+    })
   };
   return User;
 };

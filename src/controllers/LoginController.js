@@ -40,6 +40,7 @@ module.exports = {
       {
         id: userData.id,
         name: userData.name,
+        slack_member_id: userData.slack_member_id
       },
       process.env.JWT_SECRET
     );

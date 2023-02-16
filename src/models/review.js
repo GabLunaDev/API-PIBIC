@@ -14,19 +14,13 @@ const review = (sequelize, DataTypes) => {
       finished: {
         type: DataTypes.BOOLEAN,
         allowNull: false,
-        defaultValue: true
+        defaultValue: false
       },
-      first_report: {
-        type: DataTypes.STRING(1000),
-        allowNull: false
+      report: {
+        type: DataTypes.STRING(1000)
       },
-      second_report: {
-        type: DataTypes.STRING(1000),
-        allowNull: false
-      },
-      third_report: {
-        type: DataTypes.STRING(1000),
-        allowNull: false
+      rating: {
+        type: DataTypes.ENUM(["Positiva", "Negativa", "Não tem certeza"]),
       }
     },
     { freezeTableName: true }
@@ -38,19 +32,16 @@ const review = (sequelize, DataTypes) => {
             name: "article_id"
         }
     })
-    models.review.belongsTo(models.user, {
-        foreignKey: {
-            name: "first_reviewer"
-        }
+    models.review.belongsTo(models.review, {
+      as: "solicited_through",
+      foreignKey: {
+        name: "review_id"
+      }
     })
     models.review.belongsTo(models.user, {
+        allowNull: false,
         foreignKey: {
-            name: "second_reviewer"
-        }
-    })
-    models.review.belongsTo(models.user, {
-        foreignKey: {
-            name: "third_reviewer"
+            name: "reviewer_id"
         }
     })
   };

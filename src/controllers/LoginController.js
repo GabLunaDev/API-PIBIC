@@ -1,7 +1,6 @@
 const user = require("../models/user");
 const dotenv = require("dotenv/config");
 
-
 const jwt = require("jsonwebtoken");
 const argon2 = require("argon2");
 
@@ -19,8 +18,8 @@ module.exports = {
   async tryLogin(req, res, next) {
     const body = req.body;
 
-    if(!body){
-        return res.status(400).send("Corpo da requisição precisa ser preenchido")
+    if (!body) {
+      return res.status(400).send("Corpo da requisição precisa ser preenchido");
     }
 
     const userData = await user.findOne({
@@ -40,13 +39,14 @@ module.exports = {
       {
         id: userData.id,
         name: userData.name,
-        slack_member_id: userData.slack_member_id
+        slack_member_id: userData.slack_member_id,
       },
       process.env.JWT_SECRET
     );
 
     return res.send({
-        token: token
+      name: userData.name,
+      token: token,
     });
   },
 };

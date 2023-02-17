@@ -40,24 +40,81 @@ module.exports = {
   },
   async showAll(req, res, next) {
     try {
-        const reviewsData = await review.findAll({
-            logging: (log, queryObject) => {
-                logQuery(log, queryObject);
-            },
-            include: [
-              {
-                model: review,
-                as: "solicited_through",
-              }
-            ]
-        })
+      const reviewsData = await review.findAll({
+        logging: (log, queryObject) => {
+          logQuery(log, queryObject);
+        },
+        include: [
+          {
+            model: review,
+            as: "solicited_through",
+          },
+        ],
+      });
 
-        return res.status(200).send(reviewsData)
+      return res.status(200).send(reviewsData);
     } catch (error) {
       Logging.error(error);
       return res.status(500).send({ message: "Internal Server Error" });
     }
   },
-  async showOne(req, res, next) {},
-  async update(req, res, next) {},
+  async showOne(req, res, next) {
+    const reviewId = req.params.id;
+
+    try {
+      const reviewData = await review.findOne({
+        logging: (log, queryObject) => {
+          logQuery(log, queryObject);
+        },
+        where: {
+          id: reviewId,
+        },
+        include: [
+          {
+            model: review,
+            as: "solicited_through",
+          },
+        ],
+      });
+
+      if (!reviewData) {
+        return res.status(404).send({ message: "no reviews found" });
+      }
+
+      res.status(200).send(reviewData);
+    } catch (error) {
+      Logging.error(error);
+      return res.status(500).send({ message: "Internal Server Error " });
+    }
+  },
+  async update(req, res, next) {
+    const reviewId = req.params.id;
+    const body = req.body;
+
+    try {
+      const reviewData = await review.findOne({
+        logging: (log, queryObject) => {
+          logQuery(log, queryObject);
+        },
+        where: {
+          id: reviewId,
+        },
+      });
+
+      if (!reviewData) {
+        return res.status(404).send({ message: "no reviews found" });
+      }
+
+      await reviewData.update(body, {
+        logging: (log, queryObject) => {
+          logQuery(log, queryObject);
+        },
+      });
+
+      res.status(200).send({ message: "review updated with success" });
+    } catch (error) {
+      Logging.error(error);
+      return res.status(500).send({ message: "Internal Server Error " });
+    }
+  },
 };

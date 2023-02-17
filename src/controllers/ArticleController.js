@@ -2,14 +2,22 @@ const article = require("../models/article");
 const user = require("../models/user");
 const { logQuery } = require("../utils/common");
 const { Op } = require("sequelize");
-const dbConnection = require("../config/sequelize")
+const dbConnection = require("../config/sequelize");
 const Logging = require("../utils/logging");
 const review = require("../models/review");
 
 module.exports = {
   async create(req, res, next) {
-    const { name, year, language, page, search_engine, link, reviews, next_reviewer_id } =
-      req.body;
+    const {
+      name,
+      year,
+      language,
+      page,
+      search_engine,
+      link,
+      reviews,
+      next_reviewer_id,
+    } = req.body;
     const userData = req.auth;
     const created_by = userData.id;
 
@@ -20,8 +28,7 @@ module.exports = {
           .send({ message: "You can't create without the name" });
       }
 
-      await dbConnection.transaction(async(t)=> {
-
+      await dbConnection.transaction(async (t) => {
         const articleAlreadyExists = await article.findOne({
           logging: (log, queryObject) => {
             logQuery(log, queryObject);
@@ -33,7 +40,7 @@ module.exports = {
             },
           },
         });
-  
+
         let body = {
           name,
           year,
@@ -41,50 +48,49 @@ module.exports = {
           page,
           search_engine,
           link,
-          created_by
+          created_by,
         };
-  
+
         if (reviews) {
-          await reviews.map(async(valueObject) => {
-            return valueObject["reviewer_id"] =  userData.id
-          })
-  
-          body.reviews = reviews
+          await reviews.map(async (valueObject) => {
+            return (valueObject["reviewer_id"] = userData.id);
+          });
+
+          body.reviews = reviews;
         }
-  
+
         if (articleAlreadyExists) {
           return res
             .status(400)
             .send({ message: "An article with this name already exists" });
         }
-  
-        const articleData = await article.create(
-          body,
+
+        const articleData = await article.create(body, {
+          logging: (log, queryObject) => {
+            logQuery(log, queryObject);
+          },
+          transaction: t,
+          include: [
+            {
+              association: article.associations.reviews,
+            },
+          ],
+        });
+
+        await review.create(
+          {
+            review_id: articleData.reviews[0].id,
+            article_id: articleData.id,
+            reviewer_id: next_reviewer_id,
+          },
           {
             logging: (log, queryObject) => {
               logQuery(log, queryObject);
             },
             transaction: t,
-            include: [
-              {
-                association: article.associations.reviews
-              }
-            ]
           }
         );
-
-        await review.create({
-          review_id: articleData.reviews[0].id,
-          article_id: articleData.id,
-          reviewer_id: next_reviewer_id
-        }, {
-          logging: (log, queryObject) => {
-            logQuery(log, queryObject);
-          },
-          transaction: t,
-        })
-      })
-
+      });
 
       return res.status(201).send({ message: "Article created with success" });
     } catch (error) {

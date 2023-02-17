@@ -1,6 +1,7 @@
 const express = require("express");
 const routes = require("./routes");
 const Logging = require("./utils/logging");
+const cors = require("cors")
 
 const dotenv = require("dotenv/config");
 const { sequelize } = require("./models");
@@ -12,6 +13,7 @@ const { logMiddleware } = require("./middleware/LogMiddleware");
 try {
   app.use(logMiddleware);
   app.use(express.json());
+  app.use(cors());
   app.use("/api", routes);
 
   app.use(express.urlencoded({ extended: true }));

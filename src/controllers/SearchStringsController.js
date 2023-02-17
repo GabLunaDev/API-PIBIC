@@ -46,7 +46,24 @@ module.exports = {
     }
   },
   async showAll(req, res, next) {
+
+    const { search_engine, number, group } = req.query
+
     try {
+      let searchStringWhereStatement = {}
+
+      if(search_engine){
+        searchStringWhereStatement["search_engine"] = search_engine
+      }
+
+      if(number){
+        searchStringWhereStatement["number"] = number
+      }
+
+      if(group){
+        searchStringWhereStatement["group"] = group
+      }
+
       const searchStringsData = await search_strings.findAll({
         logging: (log, queryObject) => {
           logQuery(log, queryObject);

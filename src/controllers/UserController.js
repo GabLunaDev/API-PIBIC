@@ -2,6 +2,7 @@ const user = require("../models/user");
 const { logQuery } = require("../utils/common");
 const Logging = require("../utils/logging");
 const argon2 = require("argon2");
+const review = require("../models/review");
 
 module.exports = {
   async create(req, res, next) {
@@ -138,6 +139,47 @@ module.exports = {
       );
 
       return res.status(200).send({ message: "success update" });
+    } catch (error) {
+      Logging.error(error);
+      res.status(500).send({ message: "Internal Server Error!" });
+    }
+  },
+  async getReviewsByUser(req, res, next) {
+    const userId = req.params.id;
+
+    const { finished } = req.query;
+
+    try {
+      let reviewWhereStatement = {};
+
+      const userExists = await user.findByPk(userId, {
+        logging: (log, queryObject) => {
+          logQuery(log, queryObject);
+        },
+      });
+
+      if (!userExists) {
+        return res.status(404).send({ message: "this user does not exists" });
+      }
+
+      if (finished) {
+        reviewWhereStatement["finished"] = finished;
+      }
+
+      reviewWhereStatement["reviewer_id"] = userId;
+
+      const reviewData = await review.findAll({
+        logging: (log, queryObject) => {
+          logQuery(log, queryObject);
+        },
+        where: reviewWhereStatement,
+      });
+
+      if (!reviewData.length > 0) {
+        return res.status(404).send({ message: "no reviews found" });
+      }
+
+      return res.status(200).send(reviewData);
     } catch (error) {
       Logging.error(error);
       res.status(500).send({ message: "Internal Server Error!" });

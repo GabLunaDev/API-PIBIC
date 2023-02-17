@@ -100,11 +100,38 @@ module.exports = {
   },
 
   async showAll(req, res, next) {
+    const { number, included, already_validated, name, search_engine, created_by } = req.query
+
     try {
+      let articleWhereStatement = {}
+
+      if(number){
+        articleWhereStatement["number"] = number
+      }
+
+      if(included){
+        articleWhereStatement["included"] = included
+      }
+
+      if(already_validated){
+        articleWhereStatement["already_validated"] = already_validated
+      }
+
+      if(name){
+        articleWhereStatement["name"] = {
+          [Op.iLike]: `${name}%`,
+        }
+      }
+      
+      if(search_engine){
+        articleWhereStatement["search_engine"] = [search_engine]
+      }
+
       const articleData = await article.findAll({
         logging: (log, queryObject) => {
           logQuery(log, queryObject);
         },
+        where: articleWhereStatement,
         attributes: {
           exclude: ["created_by"],
         },

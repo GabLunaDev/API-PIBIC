@@ -61,11 +61,28 @@ module.exports = {
     }
   },
   async showAll(req, res, next) {
+    const { finished, rating, article_id } = req.query
+
     try {
+      let reviewWhereStatement = {}
+
+      if(finished){
+        reviewWhereStatement["finished"] = finished
+      }
+
+      if(rating){
+        reviewWhereStatement["rating"] = rating
+      }
+
+      if(article_id){
+        reviewWhereStatement["article_id"] = article_id
+      }
+
       const reviewsData = await review.findAll({
         logging: (log, queryObject) => {
           logQuery(log, queryObject);
         },
+        where: reviewWhereStatement,
         include: [
           {
             model: review,

@@ -1,5 +1,6 @@
 const search_strings = require("../models/search_strings");
 const logging = require("../utils/logging");
+const { logQuery } = require("../utils/common");
 
 module.exports = {
   async create(req, res, next) {
@@ -46,22 +47,21 @@ module.exports = {
     }
   },
   async showAll(req, res, next) {
-
-    const { search_engine, number, group } = req.query
+    const { search_engine, number, group } = req.query;
 
     try {
-      let searchStringWhereStatement = {}
+      let searchStringWhereStatement = {};
 
-      if(search_engine){
-        searchStringWhereStatement["search_engine"] = search_engine
+      if (search_engine) {
+        searchStringWhereStatement["search_engine"] = search_engine;
       }
 
-      if(number){
-        searchStringWhereStatement["number"] = number
+      if (number) {
+        searchStringWhereStatement["number"] = number;
       }
 
-      if(group){
-        searchStringWhereStatement["group"] = group
+      if (group) {
+        searchStringWhereStatement["group"] = group;
       }
 
       const searchStringsData = await search_strings.findAll({
@@ -70,7 +70,7 @@ module.exports = {
         },
       });
 
-      return res.status(201).send(searchStringsData);
+      return res.status(200).send(searchStringsData);
     } catch (error) {
       logging.error(error);
       return res.status(500).send({ message: "Internal Server Error" });
@@ -78,6 +78,8 @@ module.exports = {
   },
   async showOne(req, res, next) {
     const searchStringId = req.params.id;
+
+
     try {
       const searchStringData = await search_strings.findOne({
         logging: (log, queryObject) => {
@@ -98,6 +100,7 @@ module.exports = {
       return res.status(500).send({ message: "Internal Server Error" });
     }
   },
+
   async update(req, res, next) {
     const searchStringId = req.params.id;
     const body = req.body;
@@ -124,6 +127,7 @@ module.exports = {
         logging: (log, queryObject) => {
           logQuery(log, queryObject);
         },
+        fields: ["group", "search_engine", "string", "result"]
       });
 
       return res

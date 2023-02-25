@@ -184,6 +184,16 @@ module.exports = {
             transaction: t,
           });
 
+          const articleData = await article.findOne({
+            logging: (log, queryObject) => {
+              logQuery(log, queryObject);
+            },
+            transaction: t,
+            where: {
+              id: reviewData.article_id
+            }
+          })
+
           await review.create(
             {
               review_id: reviewData.id,
@@ -197,6 +207,8 @@ module.exports = {
               transaction: t,
             }
           );
+
+          sendMessageToReviewer(next_reviewer_id, articleData.name, articleData.number);
 
           return res.status(200).send({
             message:

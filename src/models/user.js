@@ -33,7 +33,7 @@ const user = (sequelize, DataTypes) => {
         allowNull: false,
         comment: "user's password"
       },
-      slack_member_id: {
+      slack_chat_id: {
         type: DataTypes.STRING,
         allowNull: false
       }

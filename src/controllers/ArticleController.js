@@ -1,6 +1,6 @@
 const article = require("../models/article");
 const user = require("../models/user");
-const { logQuery } = require("../utils/common");
+const { logQuery, sendMessageToReviewer } = require("../utils/common");
 const { Op } = require("sequelize");
 const dbConnection = require("../config/sequelize");
 const Logging = require("../utils/logging");
@@ -90,8 +90,11 @@ module.exports = {
             transaction: t,
           }
         );
+        
+        sendMessageToReviewer(next_reviewer_id, articleData.name, articleData.number);
       });
 
+      
       return res.status(201).send({ message: "Article created with success" });
     } catch (error) {
       Logging.error(error);
